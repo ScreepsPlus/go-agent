@@ -1,42 +1,18 @@
 package main
 
-import (
-	"io/ioutil"
-	"log"
-	"gopkg.in/yaml.v2"
-)
-
-type Config struct {
-	Servers map[string]struct {
-		Host string
-		Port string
-		Secure bool		
-		Token string
-		Username string
-		Password string
-  	Shards []string
-		Segments []int
-	  Memory []string
-	  Console struct {
-	    Prefix string
-	    Seperator string
-	  }
-	}
-	Screepsplus struct {
-		Url string
-		Token string
-	}
+type agentConfig struct {
+	Servers []agentConfigServer
 }
-
-func ReadConfig(file string) *Config {
-	var config Config
-	yamlFile, err := ioutil.ReadFile(file)
-	if err != nil {
-		log.Fatalf("Config failed to open #%v", err)
+type agentConfigServer struct {
+	Server   string
+	Shards   []string
+	Segments []int
+	Memory   string
+	Console  struct {
+		Prefix    string
+		Seperator string
 	}
-	err = yaml.Unmarshal(yamlFile, &config)
-	if err != nil {
-		log.Fatalf("Config Unmarshal %v", err)
-	}
-	return &config
+	Prefix           string
+	Interval         int
+	ScreepsplusToken string
 }
