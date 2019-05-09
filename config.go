@@ -14,5 +14,5 @@ type agentConfigServer struct {
 	}
 	Prefix           string
 	Interval         int
-	ScreepsplusToken string
+	ScreepsplusToken string `yaml:"screepsplusToken"`
 }

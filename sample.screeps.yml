@@ -1,0 +1,45 @@
+servers:
+  main:
+    host: screeps.com
+    secure: true
+    port: 443
+    token: <yourScreepsToken>
+  screepsplus:
+    host: server1.screepspl.us
+    secure: true
+    port: 443
+    username: ags131
+    password: <password>
+  localhost:
+    host: localhost
+    secure: false
+    port: 21025
+    username: ags131
+    password: password
+configs:
+  agent:
+    servers:
+    - server: main
+      segments: [1]
+      memory: stats
+      interval: 10
+      screepsplusToken: "<screepsplusToken>"
+      shards:
+      - shard1
+      - shard2
+    - server: screepsplus
+      segments: [1,2]
+      memory: stats
+      interval: 10
+      screepsplusToken: "<screepsplusToken>"
+      shards:
+      - screepsplus1
+      prefix: splus
+    - server: localhost
+      segments: [1,2]
+      memory: stats
+      interval: 10
+      screepsplusToken: "<screepsplusToken>"
+      shards:
+      - localhost1
+      prefix: testing

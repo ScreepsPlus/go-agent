@@ -12,34 +12,14 @@ import (
 )
 
 func main() {
-	aconf := &agentConfig{
-		Servers: []agentConfigServer{
-			{
-				Server:           "main",
-				Segments:         []int{1},
-				Memory:           "stats",
-				Interval:         10,
-				ScreepsplusToken: "S+ Token",
-				Shards: []string{
-					"shard1",
-					"shard2",
-				},
-			},
-			{
-				Server:           "screepsplus",
-				Segments:         []int{1, 2},
-				Memory:           "stats",
-				Interval:         10,
-				ScreepsplusToken: "S+ Token",
-				Shards: []string{
-					"screepsplus1",
-				},
-			},
-		},
-	}
 	conf := config.NewConfig()
+	aconf := &agentConfig{}
+	conf.GetConfig("agent", aconf)
+	if len(aconf.Servers) == 0 {
+		log.Fatalf("No servers defined")
+	}
 	for _, server := range aconf.Servers {
-		go runServer(conf.Servers[server.Server], server)
+		go runServer(*conf.Servers[server.Server], server)
 	}
 	select {}
 }
@@ -88,8 +68,13 @@ func runServer(conf config.ServerConfig, server agentConfigServer) {
 				}
 			}
 		}
+		if resp, err := pushStats(server.ScreepsplusToken, stats); err != nil {
+			log.Printf("[%s] Error pushing stats: %v", server.Server, err)
+		} else {
+			log.Printf("[%s] Pushed %d stats to ScreepsPlus as %s", server.Server, len(stats), resp.Format)
+		}
 		elapsed := time.Since(start)
-		log.Printf("[%s] Fetched %d stats in %dms from sources: [%s] on shards: [%s]", server.Server, len(stats), elapsed/time.Millisecond, strings.Join(sources, ","), strings.Join(server.Shards, ","))
+		log.Printf("[%s] Processed %d stats in %dms from sources: [%s] on shards: [%s]", server.Server, len(stats), elapsed/time.Millisecond, strings.Join(sources, ","), strings.Join(server.Shards, ","))
 		<-time.After((time.Duration(server.Interval) * time.Second) - elapsed)
 	}
 }
